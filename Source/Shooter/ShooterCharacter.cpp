@@ -2,6 +2,7 @@
 
 
 #include "ShooterCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
@@ -25,6 +26,17 @@ AShooterCharacter::AShooterCharacter() :
     FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
     FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); //Attach camera to end of Boom
     FollowCamera->bUsePawnControlRotation = false; //Camera does not rotate relative to arm
+
+    /* Don't rotate when the controller rotates. Let the controller only affect the camera. */
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationYaw = false;
+    bUseControllerRotationRoll = false;
+    
+    /* Configure character movement */
+    GetCharacterMovement()->bOrientRotationToMovement = true; //Character moves in the direction of movement...
+    GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f); //... at this rotation rate
+    GetCharacterMovement()->JumpZVelocity = 600.f;
+    GetCharacterMovement()->AirControl = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -60,6 +72,11 @@ void AShooterCharacter::BeginPlay()
     FString myString{ TEXT("My String!!!") };
     UE_LOG(LogTemp, Warning, TEXT("FString myString: %s"), *myString);
     UE_LOG(LogTemp, Warning, TEXT("Name of instance: %s"), *GetName());
+}
+
+/* */
+void AShooterCharacter::FireWeapon() {
+    UE_LOG(LogTemp, Warning, TEXT("Fire weapon!"));
 }
 
 /* Called for forwards / backwards input */
@@ -116,5 +133,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
     PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+    
+    PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &AShooterCharacter::FireWeapon);
+    
 }
 

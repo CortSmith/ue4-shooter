@@ -41,6 +41,10 @@ public:
      @param Rate This is a normalized rate, i.e. 1.0 means 100% of desired rate.
      */
     void LookUpAtRate(float Rate);
+    
+    /** Called when the fire button is pressed.
+     */
+    void FireWeapon();
 
 private:
     /* Camera boom positioning the camera behind the character */
