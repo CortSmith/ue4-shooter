@@ -47,20 +47,28 @@ public:
     void FireWeapon();
 
 private:
-    /* Camera boom positioning the camera behind the character */
+    /** Camera boom positioning the camera behind the character */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     class USpringArmComponent* CameraBoom;
     
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     class UCameraComponent* FollowCamera;
     
-    /* Base turn rate in degrees per second. Other scaling may affect final turn rate. */
+    /** Base turn rate in degrees per second. Other scaling may affect final turn rate. */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     float BaseTurnRate;
     
-    /* Base look up / down rate in degrees per second. Other scaling may affect final turn rate. */
+    /** Base look up / down rate in degrees per second. Other scaling may affect final turn rate. */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     float BaseLookUpRate;
+    
+    /** Randomized gunshot sound cue */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+    class USoundCue* FireSound;
+    
+    /*** Flash spawned at barrel socket */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+    class UParticleSystem* MuzzleFlash;
 
 public:
     /* Returns CameraBoom subobject */

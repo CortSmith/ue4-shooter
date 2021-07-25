@@ -5,6 +5,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 
 // Sets default values
@@ -74,11 +77,6 @@ void AShooterCharacter::BeginPlay()
     UE_LOG(LogTemp, Warning, TEXT("Name of instance: %s"), *GetName());
 }
 
-/* */
-void AShooterCharacter::FireWeapon() {
-    UE_LOG(LogTemp, Warning, TEXT("Fire weapon!"));
-}
-
 /* Called for forwards / backwards input */
 void AShooterCharacter::MoveForward(float Value) {
     if ((Controller != nullptr) && (Value != 0)) {
@@ -109,6 +107,25 @@ void AShooterCharacter::TurnAtRate(float Rate) {
 
 void AShooterCharacter::LookUpAtRate(float Rate) {
     AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds()); //deg/frame
+}
+
+/* */
+void AShooterCharacter::FireWeapon() {
+    UE_LOG(LogTemp, Warning, TEXT("Fire weapon!"));
+    
+    if (FireSound) {
+        UGameplayStatics::PlaySound2D(this, FireSound);
+    }
+    
+    const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName("BarrelSocket");
+    
+    if (BarrelSocket) {
+        const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh());
+        
+        if (MuzzleFlash) {
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+        }
+    }
 }
 
 // Called every frame
