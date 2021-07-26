@@ -66,11 +66,11 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
     class USoundCue* FireSound;
     
-    /*** Flash spawned at barrel socket */
+    /** Flash spawned at barrel socket */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
     class UParticleSystem* MuzzleFlash;
 
-    /*** Montage for firing the weapon */
+    /** Montage for firing the weapon */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
     class UAnimMontage* HipFireMontage;
 

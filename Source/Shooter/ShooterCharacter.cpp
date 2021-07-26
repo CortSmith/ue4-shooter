@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Engine/EngineTypes.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -46,35 +48,6 @@ AShooterCharacter::AShooterCharacter() :
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-    
-    /* Using UE_LOG */
-    UE_LOG(LogTemp, Warning, TEXT("BeginPlay() called!"));
-    
-    /* Using variables in UE_LOG */
-    int myInt{ 42 };
-    UE_LOG(LogTemp, Warning, TEXT("int myInt: %d"), myInt);
-    
-    float myFloat{ 3.141592f };
-    UE_LOG(LogTemp, Warning, TEXT("float myFloat: %f"), myFloat);
-    
-    double myDouble{ 0.000756 };
-    UE_LOG(LogTemp, Warning, TEXT("float myDouble: %lf"), myDouble);
-    
-    char myChar{ 'J' };
-    UE_LOG(LogTemp, Warning, TEXT("float myChar: %c"), myChar);
-    
-    wchar_t wideChar{ L'J' };
-    UE_LOG(LogTemp, Warning, TEXT("wchar_t wideChar: %lc"), wideChar);
-    
-    bool myBool{ true };
-    UE_LOG(LogTemp, Warning, TEXT("float myBool: %d"), myBool);
-    
-    UE_LOG(LogTemp, Warning, TEXT("int: %d, float: %f, bool: %d"), myInt, myFloat, myBool);
-    
-    /* Using FString in UE_LOG */
-    FString myString{ TEXT("My String!!!") };
-    UE_LOG(LogTemp, Warning, TEXT("FString myString: %s"), *myString);
-    UE_LOG(LogTemp, Warning, TEXT("Name of instance: %s"), *GetName());
 }
 
 /* Called for forwards / backwards input */
@@ -111,24 +84,39 @@ void AShooterCharacter::LookUpAtRate(float Rate) {
 
 /* */
 void AShooterCharacter::FireWeapon() {
-    UE_LOG(LogTemp, Warning, TEXT("Fire weapon!"));
-    
+    //Play weapon fire sound.
     if (FireSound) {
         UGameplayStatics::PlaySound2D(this, FireSound);
     }
     
     const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName("BarrelSocket");
     
+    //Spawn ParticleSystem using Transform of BarrelSocket on Character Mesh
     if (BarrelSocket) {
         const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh());
         
         if (MuzzleFlash) {
             UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
         }
+        
+        FHitResult FireHit;
+        
+        const FVector Start{ SocketTransform.GetLocation() };
+        const FQuat Rotation{ SocketTransform.GetRotation() };
+        const FVector RotationAxis{ Rotation.GetAxisX() };
+        const FVector End{ Start + RotationAxis * 50'000.f }; //You can use as many apostrophies in numbers to make them more readable.
+        
+        GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
+        
+        if (FireHit.bBlockingHit) {
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+            DrawDebugPoint(GetWorld(), FireHit.Location, 5, FColor::Red, false, 2.f);
+        }
     }
-
+    
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+    //Play AnimationMontage.
     if (AnimInstance && HipFireMontage) {
         AnimInstance->Montage_Play(HipFireMontage);
         AnimInstance->Montage_JumpToSection(FName("StartFire"));
